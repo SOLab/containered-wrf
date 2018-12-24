@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-MAINTAINER Rodrigo Cosme <rdccosmo@gmail.com>
+MAINTAINER Ekaterina Balashova <nerpa87@yandex.ru>
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN \
