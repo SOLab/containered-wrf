@@ -1,9 +1,11 @@
-# rdccosmo/containered-wrf
+### Forked from [rdccosmo/containered-wrf](https://github.com/rdccosmo/containered-wrf)
+
+# WRF 3.9.1.1 with shared memory parallelizm
 
 This project aims to dockerize the [WRF (Weather Research and Forecast Model)](http://www.wrf-model.org/index.php).
 It follows the instructions from this [tutorial](http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php).
 
-WRF has version 3.9.1.1, build with OpenMP support (shared memory)
+WRF has version 3.9.1.1, build with OpenMP support
 Setting are set up for using GFS input files and ARW dynamics
 
 To build:
