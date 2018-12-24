@@ -107,6 +107,7 @@ COPY --chown=wrf run_testdata.sh .
 COPY --chown=wrf cleanup.sh .
 ENV OMP_NUM_THREADS=32
 ENV OMP_STACKSIZE=128M
+ENV TZ=Europe/Moscow
 RUN echo "alias ll='ls -l'" >> ~/.bashrc
 CMD ["bash"]
 VOLUME /home/wrf/data
