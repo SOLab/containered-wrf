@@ -66,9 +66,9 @@ install_mpich() {
 }
 
 install_wrf() {
-    wget http://www2.mmm.ucar.edu/wrf/src/WRFV3.6.1.TAR.gz -P $PREFIX
-    tar -zxvf $PREFIX/WRFV3.6.1.TAR.gz -C $PREFIX
-    rm -f $PREFIX/WRFV3.6.1.TAR.gz
+    wget http://www2.mmm.ucar.edu/wrf/src/WRFV3.9.1.1.TAR.gz -P $PREFIX
+    tar -zxvf $PREFIX/WRFV3.9.1.1.TAR.gz -C $PREFIX
+    rm -f $PREFIX/WRFV3.9.1.1.TAR.gz
     cd $PREFIX/WRFV3
     echo $WRF_CONFIGURE_OPTION | ./configure
     ./compile em_real
@@ -95,11 +95,12 @@ install_jasper() {
 }
 
 install_wps() {
-	wget http://www2.mmm.ucar.edu/wrf/src/WPSV3.7.TAR.gz -P $PREFIX
-	tar zxvf $PREFIX/WPSV3.7.TAR.gz -C $PREFIX
-	rm $PREFIX/WPSV3.7.TAR.gz
+    wget http://www2.mmm.ucar.edu/wrf/src/WPSV3.9.1.TAR.gz -P $PREFIX
+    tar zxvf $PREFIX/WPSV3.9.1.TAR.gz -C $PREFIX
+    rm $PREFIX/WPSV3.9.1.TAR.gz
     cd $PREFIX/WPS
     echo 1 | NCARG_ROOT=$PREFIX PATH=$NCARG_ROOT/bin:$PATH NETCDF=$PREFIX JASPERLIB=$PREFIX/lib JASPERINC=$PREFIX/include ./configure
+    sed -i '/^LDFLAGS/ s/$/ -fopenmp/' configure.wps
     ./compile
 }
 
@@ -219,35 +220,15 @@ install_cartopy() {
 	python setup.py install --prefix $PREFIX
 }
 
-install_all() {
+install_all_deps() {
     install_szip
     install_zlib
     install_hdf5
     install_netcdf_c
     install_netcdf_fortran
-    install_mpich
-    install_wrf
+    install_mpich # TODO remove after debug
     install_libpng
     install_jasper
-    install_wps
-    install_arwpost
-    install_g2lib
-    install_w3lib
-    install_g95
-    install_cnvgrib
-    install_grads
-    install_pygrads
-    install_libgeos
-    install_anaconda
-    install_pyproj
-    install_basemap
-    install_cartopy
 }
 
-if [ ! -d /home/wrf/data ]; then
-    mkdir /home/wrf/data
-fi
-
-install_all
-
-
+"$@"

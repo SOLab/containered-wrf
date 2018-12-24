@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:16.04
 MAINTAINER Rodrigo Cosme <rdccosmo@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -42,6 +42,7 @@ RUN \
         libxaw7 \
         libmagickwand-dev \
         git \
+        vim \
         autotools-dev \
         autoconf \
         libproj9 \
@@ -64,7 +65,7 @@ ENV F77 gfortran
 ENV FFLAGS -m64
 ENV NETCDF $PREFIX
 ENV NETCDFPATH $PREFIX
-ENV WRF_CONFIGURE_OPTION 34
+ENV WRF_CONFIGURE_OPTION 33 #GNU shared memory/openmp
 ENV WRF_EM_CORE 1
 ENV WRF_NMM_CORE 0
 ENV LD_LIBRARY_PATH_WRF $PREFIX/lib/
@@ -86,13 +87,28 @@ RUN ulimit -s unlimited
 COPY requirements.yml $PREFIX
 RUN pip install --upgrade pip pip
 RUN pip install --upgrade pip setuptools
-RUN pip install -r requirements.yml
+RUN pip install -r requirements.yml --ignore-installed 
 COPY build.sh $PREFIX
 USER wrf
-RUN ./build.sh
-COPY scripts $PREFIX
-COPY entrypoint.sh $PREFIX
-ENTRYPOINT ["entrypoint.sh"]
+RUN ./build.sh install_all_deps
+RUN mkdir -p /home/wrf/data
+RUN ./build.sh install_wrf
+RUN ./build.sh install_wps
+RUN mv $PREFIX/WPS/namelist.wps $PREFIX/WPS/namelist.orig
+COPY --chown=wrf config_samples/namelist.wps $PREFIX/WPS/
+RUN mv $PREFIX/WRFV3/run/namelist.input $PREFIX/WRFV3/run/namelist.input.orig
+COPY --chown=wrf config_samples/namelist.input $PREFIX/WRFV3/run/
+WORKDIR /home/wrf/WPS
+# for gfs input files
+RUN ln -s ./ungrib/Variable_Tables/Vtable.GFS Vtable
+WORKDIR /home/wrf
+# script for running container with test data
+COPY --chown=wrf run_testdata.sh .
+COPY --chown=wrf cleanup.sh .
+ENV OMP_NUM_THREADS=32
+ENV OMP_STACKSIZE=128M
+RUN echo "alias ll='ls -l'" >> ~/.bashrc
 CMD ["bash"]
 VOLUME /home/wrf/data
-VOLUME /home/wrf/cron
+VOLUME /home/wrf/geog
+VOLUME /home/wrf/out
