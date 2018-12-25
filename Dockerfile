@@ -112,4 +112,12 @@ RUN echo "alias ll='ls -l'" >> ~/.bashrc
 CMD ["bash"]
 VOLUME /home/wrf/data
 VOLUME /home/wrf/geog
+USER root
+RUN groupadd -g 1111 wrfusers
+RUN usermod wrf -g wrfusers
+USER wrf
+RUN mkdir -p /home/wrf/out
+RUN chown wrf:wrfusers /home/wrf/out
 VOLUME /home/wrf/out
+ENV OUTDIR=/home/wrf/out
+USER wrf
